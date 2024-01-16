@@ -83,6 +83,82 @@ public class GoModelTest {
         Assert.assertFalse(property3.required);
     }
 
+    @Test(description = "check that proper types are used")
+    public void properTypes() {
+        final Schema model = new Schema()
+                .description("a sample model")
+                .addProperty("aInt", new IntegerSchema().format(SchemaTypeUtil.INTEGER_TYPE))
+                .addProperty("aInt32", new IntegerSchema().format(SchemaTypeUtil.INTEGER32_FORMAT))
+                .addProperty("aInt64", new IntegerSchema().format(SchemaTypeUtil.INTEGER64_FORMAT))
+                .addProperty("aUint", new IntegerSchema().format("uint"))
+                .addProperty("aUint32", new IntegerSchema().format("uint32"))
+                .addProperty("aUint64", new IntegerSchema().format("uint64"));
+        final DefaultCodegen codegen = new GoClientCodegen();
+        OpenAPI openAPI = TestUtils.createOpenAPIWithOneSchema("sample", model);
+        codegen.setOpenAPI(openAPI);
+        final CodegenModel cm = codegen.fromModel("sample", model);
+
+        Assert.assertEquals(cm.name, "sample");
+        Assert.assertEquals(cm.classname, "Sample");
+        Assert.assertEquals(cm.description, "a sample model");
+        Assert.assertEquals(cm.vars.size(), 6);
+        Assert.assertEquals(cm.imports.size(), 0);
+
+        final CodegenProperty property1 = cm.vars.get(0);
+        Assert.assertEquals(property1.baseName, "aInt");
+        Assert.assertEquals(property1.dataType, "int32");
+        Assert.assertEquals(property1.name, "AInt");
+        Assert.assertNull(property1.defaultValue);
+        Assert.assertEquals(property1.baseType, "int32");
+        Assert.assertFalse(property1.required);
+        Assert.assertTrue(property1.isPrimitiveType);
+
+        final CodegenProperty property2 = cm.vars.get(1);
+        Assert.assertEquals(property2.baseName, "aInt32");
+        Assert.assertEquals(property2.dataType, "int32");
+        Assert.assertEquals(property2.name, "AInt32");
+        Assert.assertNull(property2.defaultValue);
+        Assert.assertEquals(property2.baseType, "int32");
+        Assert.assertFalse(property2.required);
+        Assert.assertTrue(property2.isPrimitiveType);
+
+        final CodegenProperty property3 = cm.vars.get(2);
+        Assert.assertEquals(property3.baseName, "aInt64");
+        Assert.assertEquals(property3.dataType, "int64");
+        Assert.assertEquals(property3.name, "AInt64");
+        Assert.assertNull(property3.defaultValue);
+        Assert.assertEquals(property3.baseType, "int64");
+        Assert.assertFalse(property3.required);
+        Assert.assertTrue(property3.isPrimitiveType);
+
+        final CodegenProperty property4 = cm.vars.get(3);
+        Assert.assertEquals(property4.baseName, "aUint");
+        Assert.assertEquals(property4.dataType, "unt32");
+        Assert.assertEquals(property4.name, "AUint");
+        Assert.assertNull(property4.defaultValue);
+        Assert.assertEquals(property4.baseType, "uint32");
+        Assert.assertFalse(property4.required);
+        Assert.assertTrue(property4.isPrimitiveType);
+
+        final CodegenProperty property5 = cm.vars.get(4);
+        Assert.assertEquals(property5.baseName, "aUint32");
+        Assert.assertEquals(property5.dataType, "uint32");
+        Assert.assertEquals(property5.name, "AUint32");
+        Assert.assertNull(property5.defaultValue);
+        Assert.assertEquals(property5.baseType, "uint32");
+        Assert.assertFalse(property5.required);
+        Assert.assertTrue(property5.isPrimitiveType);
+
+        final CodegenProperty property6 = cm.vars.get(5);
+        Assert.assertEquals(property6.baseName, "aUint64");
+        Assert.assertEquals(property6.dataType, "uint64");
+        Assert.assertEquals(property6.name, "AUint64");
+        Assert.assertNull(property6.defaultValue);
+        Assert.assertEquals(property6.baseType, "uint64");
+        Assert.assertFalse(property6.required);
+        Assert.assertTrue(property6.isPrimitiveType);
+    }
+
     @Test(description = "convert a model with list property")
     public void listPropertyTest() {
         final Schema model = new Schema()
@@ -278,14 +354,14 @@ public class GoModelTest {
 
     @DataProvider(name = "modelNames")
     public static Object[][] primeNumbers() {
-        return new Object[][] {
-            {"sample", "Sample"},
-            {"sample_name", "SampleName"},
-            {"sample__name", "SampleName"},
-            {"/sample", "Sample"},
-            {"\\sample", "Sample"},
-            {"sample.name", "SampleName"},
-            {"_sample", "Sample"},
+        return new Object[][]{
+                {"sample", "Sample"},
+                {"sample_name", "SampleName"},
+                {"sample__name", "SampleName"},
+                {"/sample", "Sample"},
+                {"\\sample", "Sample"},
+                {"sample.name", "SampleName"},
+                {"_sample", "Sample"},
         };
     }
 
@@ -303,9 +379,9 @@ public class GoModelTest {
 
     @DataProvider(name = "modelMappedNames")
     public static Object[][] mappedNames() {
-        return new Object[][] {
-            {"mapped", "Remapped", "model_remapped.go"},
-            {"mapped_underscore", "RemappedUnderscore", "model_remapped_underscore.go"},
+        return new Object[][]{
+                {"mapped", "Remapped", "model_remapped.go"},
+                {"mapped_underscore", "RemappedUnderscore", "model_remapped_underscore.go"},
         };
     }
 
